@@ -1,0 +1,98 @@
+#!/usr/bin/python3 -B
+
+import os
+import sys
+import tempfile
+import utils
+
+
+def main():
+    if len(sys.argv) < 4:
+        usage()
+        sys.exit(1)
+    solver = sys.argv[1]
+    d = sys.argv[2]
+    instances = sys.argv[3:]
+
+    if solver not in get_solvers():
+        print('Invalid solver:', solver)
+        usage()
+        sys.exit(1)
+
+    if d == 'file':
+        d = None
+    else:
+        try:
+            d = int(d)
+            if d < 2:
+                raise Exception()
+        except:
+            print('d must be file or a number >= 2')
+            sys.exit(1)
+
+    run(solver, d, instances)
+
+
+def run(solver, d, instances):
+    print('instance,d,solver,time,obj,solution')
+    for instance in instances:
+        w, dd, s = utils.read(instance)
+        if d == None:
+            if dd == None:
+                print(instance, 'no degree constrained provided')
+                continue
+        else:
+            dd = [d] * len(w)
+        utils.scale(w, s)
+        with write(w, dd) as tmp:
+            time, obj, sol = run_solver(solver, instance, tmp.name)
+            obj /= s
+            print('{},{},{},{:g},{:g},{}'.format(
+                instance, d, solver, time, obj, sol))
+
+
+def write(w, d):
+    n = len(w)
+    m = 0
+    for i in range(n):
+        for j in range(i + 1, n):
+            if w[i][j] != None:
+                m += 1
+    tmp = tempfile.NamedTemporaryFile(mode='w')
+    print(n, m, file=tmp.file)
+    for i in range(n):
+        for j in range(i + 1, n):
+            if w[i][j] != None:
+                print(i + 1, j + 1, w[i][j], file=tmp.file)
+    for i, d in enumerate(d):
+        print(i + 1, d, file=tmp)
+    tmp.flush()
+    return tmp
+
+
+def run_solver(solver, instance, path):
+    import subprocess
+    print('running {} {} ({})'.format(solver, instance, path), file=sys.stderr)
+    result = subprocess.run(
+        ['solvers/' + solver, path], check=True, stdout=subprocess.PIPE)
+    lines = result.stdout.decode().split('\n')
+    return float(lines[0]), int(float(lines[1])), lines[2]
+
+
+def usage():
+    solvers = get_solvers()
+    print(
+        'Usage: {} solver (file | number) instance [instance ...]'.format(sys.argv[0]))
+    print('    solver - one of', ', '.join(solvers))
+    print('    file   - the degree constrain is read from the instance file')
+    print('    numer  - use number as degree constrain (>= 2)')
+
+
+def get_solvers():
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+    return sorted(list(s for s in os.listdir('solvers/') if is_exe('solvers/' + s)))
+
+
+if __name__ == "__main__":
+    main()
