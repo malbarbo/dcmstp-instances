@@ -1,0 +1,26 @@
+#!/usr/bin/python3 -B
+
+import os
+import sys
+import subprocess
+
+BCP = os.path.join(os.path.dirname(sys.argv[0]), '../target/solvers/bcp')
+
+
+def main():
+    result = subprocess.run(
+        [BCP, '0', sys.argv[1], '/dev/null'], stdout=subprocess.PIPE)
+    lines = result.stdout.decode().split('\n')
+    print(float(get_value('Total time: ', lines)))
+    print(float(get_value('UB: ', lines)))
+    print("")  # no solution
+
+
+def get_value(key, lines):
+    for line in reversed(lines):
+        if line.startswith(key):
+            return line[len(key):].strip()
+
+
+if __name__ == "__main__":
+    main()

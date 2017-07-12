@@ -30,7 +30,7 @@ $(INSTANCES)/fixed/m050n1:
 		tar xzf - --strip-components 1 -C $(INSTANCES)/fixed/
 
 
-solvers: download-concorde download-cgbc
+solvers: download-concorde download-choco download-cgbc download-bcp download-bcp-bc
 
 # http://www.math.uwaterloo.ca/tsp/concorde/index.html
 download-concorde: $(SOLVERS)/concorde
@@ -55,7 +55,16 @@ $(SOLVERS)/cgbc:
 	curl -L http://homepages.dcc.ufmg.br/~luishbicalho/dcmst/CGBC.tar |\
 		tar xzf - -C $(SOLVERS)/ cgbc
 
+download-bcp: $(SOLVERS)/bcp
+$(SOLVERS)/bcp:
+	curl -L http://homepages.dcc.ufmg.br/~luishbicalho/dcmst/BCP.tar |\
+		tar xzf - -C $(SOLVERS)/ bcp
+
+download-bcp-bc: $(SOLVERS)/bcp_bc
+$(SOLVERS)/bcp_bc:
+	curl -L http://homepages.dcc.ufmg.br/~luishbicalho/dcmst/BCP_BC.tar |\
+		tar xzf - -C $(SOLVERS)/ bcp_bc
 
 .PHONY: all \
 	instances download-var-instances download-shrd-instances download-ieee-instances \
-	solvers download-concorde download-choco download-cgbc
+	solvers download-concorde download-choco download-cgbc download-bcp download-bcp-bc
