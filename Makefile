@@ -65,6 +65,9 @@ $(SOLVERS)/bcp_bc:
 	curl -L http://homepages.dcc.ufmg.br/~luishbicalho/dcmst/BCP_BC.tar |\
 		tar xzf - -C $(SOLVERS)/ bcp_bc
 
+# TODO: add lkh
+# TODO: add ndrc-bc
+
 .PHONY: all \
 	instances download-var-instances download-shrd-instances download-ieee-instances \
 	solvers download-concorde download-choco download-cgbc download-bcp download-bcp-bc

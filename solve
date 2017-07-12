@@ -1,6 +1,7 @@
 #!/usr/bin/python3 -B
 
 import os
+import subprocess
 import sys
 import tempfile
 
@@ -45,6 +46,7 @@ def run(solver, d, instances):
         else:
             dd = [d] * len(w)
         utils.scale(w, s)
+        # TODO: allow run in parallel
         with write(w, dd) as tmp:
             time, obj, sol = run_solver(solver, instance, tmp.name)
             obj /= s
@@ -72,7 +74,7 @@ def write(w, d):
 
 
 def run_solver(solver, instance, path):
-    import subprocess
+    # TODO: add a verbose flag
     print('running {} {} ({})'.format(solver, instance, path), file=sys.stderr)
     result = subprocess.run(
         ['solvers/' + solver, path], check=True, stdout=subprocess.PIPE)
