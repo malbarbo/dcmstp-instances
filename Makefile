@@ -33,13 +33,22 @@ solvers: download-concorde
 
 # http://www.math.uwaterloo.ca/tsp/concorde/index.html
 download-concorde: $(SOLVERS)/concorde
-$(SOLVERS)/bin/concorde:
+$(SOLVERS)/concorde:
 	@echo Downloading concorde
 	mkdir -p $(SOLVERS)
 	curl -L http://www.math.uwaterloo.ca/tsp/concorde/downloads/codes/linux24/concorde.gz |\
 	    gunzip -c > $(SOLVERS)/concorde
 	chmod +x $(SOLVERS)/concorde
 
+download-choco: $(SOLVERS)/dcmstp-choco/target/dcmstp-choco-4.1.1-shaded.jar
+$(SOLVERS)/dcmstp-choco/target/dcmstp-choco-4.1.1-shaded.jar:
+	@echo Downloading dcmstp-choco
+	if [ ! -d $(SOLVERS)/dcmstp-choco/.git ]; then \
+		git clone https://github.com/malbarbo/dcmstp-choco $(SOLVERS)/dcmstp-choco; \
+	fi
+	@echo Compiling dcmstp-choco
+	mvn -f $(SOLVERS)/dcmstp-choco/pom.xml package
+
 .PHONY: all \
 	instances download-var-instances download-shrd-instances download-ieee-instances \
-	solvers download-concorde
+	solvers download-concorde download-choco
