@@ -1,8 +1,8 @@
 #!/usr/bin/python3 -B
 
 import os
-import sys
 import subprocess
+import sys
 
 BCP = os.path.join(os.path.dirname(sys.argv[0]), '../target/solvers/bcp')
 
