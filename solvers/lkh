@@ -1,0 +1,62 @@
+#!/usr/bin/python3 -B
+
+import os
+import resource
+import subprocess
+import sys
+import tempfile
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import utils
+
+
+LKH = os.path.join(
+    os.path.dirname(sys.argv[0]), '../target/solvers/LKH/LKH')
+
+
+def main():
+    m, d = utils.read_andinst(utils.read_values(sys.argv[1]))
+    if any(x != 2 for x in d):
+        raise Exception('All degree must be 2')
+    m = utils.add_dummy_vertex(m)
+    with tempfile.NamedTemporaryFile(mode='w') as tsp:
+        utils.write_tsp(tsp, m)
+        with tempfile.NamedTemporaryFile(mode='w') as par:
+            write_par(par, tsp.name)
+            r1 = resource.getrusage(resource.RUSAGE_CHILDREN)
+            subprocess.run(
+                [LKH, par.name], check=True,  stdout=subprocess.PIPE)
+            r2 = resource.getrusage(resource.RUSAGE_CHILDREN)
+            tour = tsp.name + '.tour'
+            obj, sol = read_tour(tour)
+            os.remove(tour)
+            time = (r2.ru_utime + r2.ru_stime) - (r1.ru_utime + r1.ru_stime)
+            print(time)
+            print(obj)
+            print(sol)
+
+
+def read_tour(f):
+    lines = open(f).readlines()
+    obj = None
+    for line in lines:
+        if line.startswith('COMMENT : Length ='):
+            obj = int(line.split()[-1])
+    i = lines.index('TOUR_SECTION\n')
+    tour = list(map(lambda x: int(x), lines[i + 1:-2]))
+    n = len(tour)
+    i = tour.index(n)
+    tour = tour[i + 1:] + tour[:i]
+    t = ' '.join('{}-{}'.format(tour[i] - 1, tour[i + 1] - 1)
+                 for i in range(len(tour) - 1))
+    return obj, t
+
+
+def write_par(f, problem):
+    print('PROBLEM_FILE =', problem, file=f)
+    print('OUTPUT_TOUR_FILE =', problem + '.tour', file=f)
+    f.flush()
+
+
+if __name__ == "__main__":
+    main()
