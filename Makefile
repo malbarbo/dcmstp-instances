@@ -29,7 +29,8 @@ $(INSTANCES)/fixed/m050n1:
 	curl -L https://turing.cs.hbg.psu.edu/txn131/file_instances/spanning_tree/IEEE-Graphs.tar.gz |\
 		tar xzf - --strip-components 1 -C $(INSTANCES)/fixed/
 
-solvers: download-concorde
+
+solvers: download-concorde download-cgbc
 
 # http://www.math.uwaterloo.ca/tsp/concorde/index.html
 download-concorde: $(SOLVERS)/concorde
@@ -49,6 +50,12 @@ $(SOLVERS)/dcmstp-choco/target/dcmstp-choco-4.1.1-shaded.jar:
 	@echo Compiling dcmstp-choco
 	mvn -f $(SOLVERS)/dcmstp-choco/pom.xml package
 
+download-cgbc: $(SOLVERS)/cgbc
+$(SOLVERS)/cgbc:
+	curl -L http://homepages.dcc.ufmg.br/~luishbicalho/dcmst/CGBC.tar |\
+		tar xzf - -C $(SOLVERS)/ cgbc
+
+
 .PHONY: all \
 	instances download-var-instances download-shrd-instances download-ieee-instances \
-	solvers download-concorde download-choco
+	solvers download-concorde download-choco download-cgbc

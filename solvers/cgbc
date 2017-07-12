@@ -1,0 +1,30 @@
+#!/usr/bin/python3 -B
+
+import os
+import sys
+import subprocess
+
+CGBC = os.path.join(os.path.dirname(sys.argv[0]), '../target/solvers/cgbc')
+
+
+def main():
+    result = subprocess.run(
+        [CGBC, '0', sys.argv[1], '/dev/null'], stdout=subprocess.PIPE)
+    try:
+        os.remove('resumo.txt')
+    except:
+        pass
+    lines = result.stdout.decode().split('\n')
+    print(float(get_value('T(s): ', lines)))
+    print(float(get_value('UB: ', lines)))
+    print("")  # no solution
+
+
+def get_value(key, lines):
+    for line in reversed(lines):
+        if line.startswith(key):
+            return line[len(key):].strip()
+
+
+if __name__ == "__main__":
+    main()
