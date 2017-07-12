@@ -1,0 +1,63 @@
+#!/usr/bin/python3 -B
+
+import csv
+import sys
+
+import networkx as nx
+
+import utils
+
+
+def main():
+    for f in sys.argv[1:]:
+        with open(f) as csvfile:
+            for i, row in enumerate(csv.DictReader(csvfile)):
+                instance = row['instance']
+                d = row['d']
+                obj = float(row['obj'])
+                sol = list(map(parse_edge, row['solution'].split()))
+                violations = check(instance, d, obj, sol)
+                if violations != []:
+                    print(i + 1, violations)
+
+
+def check(instance, d, obj, edges):
+    w, dd, s = utils.read(instance)
+    n = len(w)
+    utils.scale(w, s)
+    if d != 'file':
+        dd = [int(d)] * n
+
+    exp_obj = 0
+    degree = [0] * n
+    for u, v in edges:
+        degree[u] += 1
+        degree[v] += 1
+        exp_obj += w[u][v]
+
+    violations = []
+
+    for v in range(n):
+        if degree[v] > dd[v]:
+            violations.append(
+                '{} has degree {} > {}'.format(v), degree[v], dd[v])
+
+    G = nx.Graph()
+    G.add_edges_from(edges)
+    if G.number_of_nodes() != n or G.number_of_edges() + 1 != n or not nx.algorithms.is_tree(G):
+        violations.append('not a tree')
+
+    exp_obj /= s
+    if obj != exp_obj:
+        violations.append('obj {} is not {}'.format(obj, exp_obj))
+
+    return violations
+
+
+def parse_edge(s):
+    u, v = s.split('-')
+    return int(u), int(v)
+
+
+if __name__ == "__main__":
+    main()
