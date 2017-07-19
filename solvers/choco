@@ -1,24 +1,25 @@
 #!/usr/bin/python3 -B
 
 import os
-import subprocess
 import sys
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import utils
 
 JAR = os.path.join(
     os.path.dirname(sys.argv[0]), '../target/solvers/dcmstp-choco/target/dcmstp-choco-4.1.1-shaded.jar')
 
 
 def main():
-    result = subprocess.run(
-        ['java', '-jar', JAR, sys.argv[1]], stdout=subprocess.PIPE)
-    lines = result.stdout.decode().split('\n')
-    print(float(get_value('time = ', lines)))
-    print(float(get_value('obj = ', lines)))
-    print(get_value('solution = ', lines))
+    (time, output) = utils.subprocess_time_output(
+        ['java', '-jar', JAR, sys.argv[1]])
+    print(float(get_value('time = ', output)))
+    print(float(get_value('obj = ', output)))
+    print(get_value('solution = ', output))
 
 
-def get_value(key, lines):
-    for line in reversed(lines):
+def get_value(key, output):
+    for line in reversed(output):
         if line.startswith(key):
             return line[len(key):].strip()
 

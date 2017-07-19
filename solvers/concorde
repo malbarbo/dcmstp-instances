@@ -1,7 +1,6 @@
 #!/usr/bin/python3 -B
 
 import os
-import subprocess
 import sys
 import tempfile
 
@@ -20,11 +19,10 @@ def main():
     m = utils.add_dummy_vertex(m)
     with tempfile.NamedTemporaryFile(mode='w') as tmp:
         utils.write_tsp(tmp, m)
-        result = subprocess.run(
-            [CONCORDE, '-x', '-f', tmp.name], stdout=subprocess.PIPE)
-        lines = result.stdout.decode().split('\n')
-        time = float(get_value('Total Running Time:', lines))
-        obj = float(get_value('Optimal Solution:', lines))
+        time, output = utils.subprocess_time_output(
+            [CONCORDE, '-x', '-f', tmp.name])
+        time = float(get_value('Total Running Time:', output))
+        obj = float(get_value('Optimal Solution:', output))
         base = os.path.basename(tmp.name)
         f = base + '.sol'
         sol = read_solution(f)[1:-1]
@@ -58,8 +56,8 @@ def read_solution(f):
     return r
 
 
-def get_value(key, lines):
-    for line in lines:
+def get_value(key, output):
+    for line in output:
         if line.startswith(key):
             return line[len(key):].split()[0]
 

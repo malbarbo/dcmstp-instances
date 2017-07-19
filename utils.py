@@ -1,24 +1,36 @@
+import logging
 import math
 import os
+import resource
+import subprocess
 import sys
+
+logging.basicConfig(
+    format='%(message)s', level=logging.INFO, stream=sys.stderr)
+
+
+def info(msg, *args, **kwargs):
+    logging.info('info: ' + msg.format(*args, **kwargs))
+    sys.stderr.flush()
 
 
 def read(f):
+    info('Reading {}', f)
     vals = read_values(f)
     if f.startswith('target/instances/fixed/crd'):
-        sys.stderr.write('reading crd\n')
+        info('  as crd')
         return read_crd(vals), None, 10000
-    if f.startswith('target/instances/fixed/m') or f.startswith('instances/fixed/R'):
-        sys.stderr.write('reading full matrix\n')
+    if f.startswith('target/instances/fixed/m') or f.startswith('target/instances/fixed/R'):
+        info('  as full matrix')
         return read_full_matrix(vals), None, 10000
     if f.startswith('target/instances/fixed/'):
-        sys.stderr.write('reading lower row\n')
+        info('  as lower row')
         return read_lower_row(vals), None, 1
     if f.startswith('target/instances/variable/ANDINST'):
-        sys.stderr.write('reading ANDINST\n')
+        info('  as ANDINST')
         return read_andinst(vals) + (1,)
     if f.startswith('target/instances/variable/'):
-        sys.stderr.write('reading non ANDINST\n')
+        info('  as non ANDINST')
         return read_non_andinst(vals) + (1,)
     raise Exception('unknown format')
 
@@ -80,7 +92,7 @@ def read_non_andinst(vals):
     assert vals[0] == '1'
     n = int(vals[1])
     m = int(vals[2])
-    vals = list(map(int, vals[3:3 + n + m]))
+    vals = list(map(int, vals[3:3 + n + 3 * m]))
     M = matrix(n)
     d = vals[:n]
     vals = vals[n:]
@@ -135,3 +147,17 @@ def str_solution(sol):
     '1-2 3-4'
     """
     return ' '.join('{}-{}'.format(u, v) for u, v in sol)
+
+
+def subprocess_time_output(args):
+    info('Running {}', args)
+    r1 = resource.getrusage(resource.RUSAGE_CHILDREN)
+    output = []
+    with subprocess.Popen(args, universal_newlines=True, stdout=subprocess.PIPE) as proc:
+        for line in proc.stdout:
+            line = line.replace('\n', '')
+            output.append(line)
+            info(line)
+    r2 = resource.getrusage(resource.RUSAGE_CHILDREN)
+    time = (r2.ru_utime + r2.ru_stime) - (r1.ru_utime + r1.ru_stime)
+    return time, output

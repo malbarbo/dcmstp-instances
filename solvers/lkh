@@ -1,8 +1,6 @@
 #!/usr/bin/python3 -B
 
 import os
-import resource
-import subprocess
 import sys
 import tempfile
 
@@ -23,14 +21,10 @@ def main():
         utils.write_tsp(tsp, m)
         with tempfile.NamedTemporaryFile(mode='w') as par:
             write_par(par, tsp.name)
-            r1 = resource.getrusage(resource.RUSAGE_CHILDREN)
-            subprocess.run(
-                [LKH, par.name], check=True,  stdout=subprocess.PIPE)
-            r2 = resource.getrusage(resource.RUSAGE_CHILDREN)
+            (time, output) = utils.subprocess_time_output([LKH, par.name])
             tour = tsp.name + '.tour'
             obj, sol = read_tour(tour)
             os.remove(tour)
-            time = (r2.ru_utime + r2.ru_stime) - (r1.ru_utime + r1.ru_stime)
             print(time)
             print(obj)
             print(sol)

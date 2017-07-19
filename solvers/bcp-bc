@@ -1,23 +1,24 @@
 #!/usr/bin/python3 -B
 
 import os
-import subprocess
 import sys
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import utils
 
 BCP_BC = os.path.join(os.path.dirname(sys.argv[0]), '../target/solvers/bcp_bc')
 
 
 def main():
-    result = subprocess.run(
-        [BCP_BC, '0', sys.argv[1], '/dev/null'], stdout=subprocess.PIPE)
-    lines = result.stdout.decode().split('\n')
-    print(float(get_value('Total time: ', lines)))
-    print(float(get_value('UB: ', lines)))
+    time, output = utils.subprocess_time_output(
+        [BCP_BC, '0', sys.argv[1], '/dev/null'])
+    print(float(get_value('Total time: ', output)))
+    print(float(get_value('UB: ', output)))
     print("")  # no solution
 
 
-def get_value(key, lines):
-    for line in reversed(lines):
+def get_value(key, output):
+    for line in reversed(output):
         if line.startswith(key):
             return line[len(key):].strip()
 
