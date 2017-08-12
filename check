@@ -40,7 +40,7 @@ def check(instance, d, obj, edges):
     for v in range(n):
         if degree[v] > dd[v]:
             violations.append(
-                '{} has degree {} > {}'.format(v), degree[v], dd[v])
+                '{} has degree {} > {}'.format(v, degree[v], dd[v]))
 
     G = nx.Graph()
     G.add_edges_from(edges)
