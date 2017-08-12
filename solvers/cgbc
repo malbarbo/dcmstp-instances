@@ -16,7 +16,7 @@ def main():
         os.remove('resumo.txt')
     except:
         pass
-    print(float(get_value('T(s): ', output)))
+    print(float(get_value('Total time: ', output)))
     print(float(get_value('UB: ', output)))
     print("")  # no solution
 
