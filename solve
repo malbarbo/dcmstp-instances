@@ -1,12 +1,12 @@
 #!/usr/bin/python3 -B
 
+from __future__ import print_function
+
 import os
 import subprocess
 import sys
-import tempfile
 
 import utils
-
 
 def main():
     if len(sys.argv) < 4:
@@ -45,38 +45,11 @@ def run(solver, d, instances):
             dd = [d] * len(w)
         utils.scale(w, s)
         # TODO: allow run in parallel
-        with write(w, dd) as tmp:
-            time, obj, sol = run_solver(solver, instance, tmp.name)
+        with utils.write_andinst(w, dd) as tmp:
+            time, obj, sol = utils.run_solver(solver, instance, tmp.name)
             obj /= s
             print('{},{},{},{:g},{:g},{}'.format(
                 instance, d, solver, time, obj, sol))
-
-
-def write(w, d):
-    n = len(w)
-    m = 0
-    for i in range(n):
-        for j in range(i + 1, n):
-            if w[i][j] != None:
-                m += 1
-    tmp = tempfile.NamedTemporaryFile(mode='w')
-    print(n, m, file=tmp.file)
-    for i in range(n):
-        for j in range(i + 1, n):
-            if w[i][j] != None:
-                print(i + 1, j + 1, w[i][j], file=tmp.file)
-    for i, d in enumerate(d):
-        print(i + 1, d, file=tmp)
-    tmp.flush()
-    return tmp
-
-
-def run_solver(solver, instance, path):
-    utils.info('Running {} {} ({})', solver, instance, path)
-    result = subprocess.run(
-        ['solvers/' + solver, path], check=True, stdout=subprocess.PIPE)
-    lines = result.stdout.decode().split('\n')
-    return float(lines[0]), int(float(lines[1])), lines[2]
 
 
 def usage():
@@ -85,7 +58,7 @@ def usage():
         'Usage: {} solver (file | number) instance [instance ...]'.format(sys.argv[0]))
     print('    solver - one of', ', '.join(solvers))
     print('    file   - the degree constrain is read from the instance file')
-    print('    numer  - use number as degree constrain (>= 2)')
+    print('    numer  - use number as degree constraint (>= 2)')
 
 
 def get_solvers():

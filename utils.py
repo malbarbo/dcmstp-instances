@@ -1,9 +1,15 @@
+from __future__ import print_function
+
 import logging
 import math
 import os
 import resource
 import subprocess
 import sys
+import tempfile
+
+
+# Logging
 
 logging.basicConfig(
     format='%(message)s', level=logging.INFO, stream=sys.stderr)
@@ -14,12 +20,14 @@ def info(msg, *args, **kwargs):
     sys.stderr.flush()
 
 
+# Input
+
 def read(f):
     info('Reading {}', f)
     vals = read_values(f)
     if f.startswith('target/instances/fixed/crd'):
         info('  as crd')
-        return read_crd(vals), None, 10000
+        return read_crd(vals), None, 100
     if f.startswith('target/instances/fixed/m') or f.startswith('target/instances/fixed/R'):
         info('  as full matrix')
         return read_full_matrix(vals), None, 10000
@@ -108,6 +116,8 @@ def read_values(f):
     return list(open(f).read().split())
 
 
+# Output
+
 def write_tsp(f, m):
     print('TYPE : TSP', file=f)
     print('DIMENSION :', len(m), file=f)
@@ -120,6 +130,59 @@ def write_tsp(f, m):
     print('EOF', file=f)
     f.flush()
 
+
+def write_andinst(w, d):
+    n = len(w)
+    m = 0
+    for i in range(n):
+        for j in range(i + 1, n):
+            if w[i][j] != None:
+                m += 1
+    tmp = tempfile.NamedTemporaryFile(mode='w')
+    print(n, m, file=tmp.file)
+    for i in range(n):
+        for j in range(i + 1, n):
+            if w[i][j] != None:
+                print(i + 1, j + 1, w[i][j], file=tmp.file)
+    for i, d in enumerate(d):
+        print(i + 1, d, file=tmp)
+    tmp.flush()
+    return tmp
+
+
+def str_solution(sol):
+    """
+    >>> str_soltuion([(1, 2), (3, 4)])
+    '1-2 3-4'
+    """
+    return ' '.join('{}-{}'.format(u, v) for u, v in sol)
+
+
+# Subprocess
+
+def run_solver(solver, instance, path):
+    info('Running {} {} ({})', solver, instance, path)
+    result = subprocess.check_output(['solvers/' + solver, path])
+    lines = result.decode().split('\n')
+    return float(lines[0]), int(float(lines[1])), lines[2]
+
+
+
+def subprocess_time_output(args):
+    info('Running {}', args)
+    r1 = resource.getrusage(resource.RUSAGE_CHILDREN)
+    output = []
+    with subprocess.Popen(args, universal_newlines=True, stdout=subprocess.PIPE) as proc:
+        for line in proc.stdout:
+            line = line.replace('\n', '')
+            output.append(line)
+            info(line)
+    r2 = resource.getrusage(resource.RUSAGE_CHILDREN)
+    time = (r2.ru_utime + r2.ru_stime) - (r1.ru_utime + r1.ru_stime)
+    return time, output
+
+
+# Others
 
 def matrix(n):
     return [[None] * n for _ in range(n)]
@@ -139,25 +202,3 @@ def scale(m, s):
         for i in range(len(line)):
             if line[i] != None:
                 line[i] = int(line[i] * s)
-
-
-def str_solution(sol):
-    """
-    >>> str_soltuion([(1, 2), (3, 4)])
-    '1-2 3-4'
-    """
-    return ' '.join('{}-{}'.format(u, v) for u, v in sol)
-
-
-def subprocess_time_output(args):
-    info('Running {}', args)
-    r1 = resource.getrusage(resource.RUSAGE_CHILDREN)
-    output = []
-    with subprocess.Popen(args, universal_newlines=True, stdout=subprocess.PIPE) as proc:
-        for line in proc.stdout:
-            line = line.replace('\n', '')
-            output.append(line)
-            info(line)
-    r2 = resource.getrusage(resource.RUSAGE_CHILDREN)
-    time = (r2.ru_utime + r2.ru_stime) - (r1.ru_utime + r1.ru_stime)
-    return time, output
