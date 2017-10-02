@@ -44,6 +44,7 @@ def run(solver, d, instances):
         else:
             dd = [d] * len(w)
         utils.scale(w, s)
+        # TODO: avoid writing the instance if it is already in the correct format
         # TODO: allow run in parallel
         with utils.write_andinst(w, dd) as tmp:
             time, obj, sol = utils.run_solver(solver, instance, tmp.name)
@@ -58,7 +59,7 @@ def usage():
         'Usage: {} solver (file | number) instance [instance ...]'.format(sys.argv[0]))
     print('    solver - one of', ', '.join(solvers))
     print('    file   - the degree constrain is read from the instance file')
-    print('    numer  - use number as degree constraint (>= 2)')
+    print('    number - use number as degree constraint (>= 2)')
 
 
 def get_solvers():

@@ -76,6 +76,7 @@ $(SOLVERS)/bcp_bc:
 		tar xzf - -C $(SOLVERS)/ bcp_bc
 
 # TODO: add ndrc-bc
+# TODO: add checksum for the download binaries
 
 .PHONY: all \
 	instances download-var-instances download-shrd-instances download-ieee-instances \
