@@ -2,6 +2,7 @@
 
 import csv
 import sys
+import logging
 
 import networkx as nx
 
@@ -9,6 +10,7 @@ import utils
 
 
 def main():
+    logging.getLogger().setLevel(logging.ERROR)
     for f in sys.argv[1:]:
         with open(f) as csvfile:
             for i, row in enumerate(csv.DictReader(csvfile)):
@@ -44,7 +46,10 @@ def check(instance, d, obj, edges):
 
     G = nx.Graph()
     G.add_edges_from(edges)
-    if G.number_of_nodes() != n or G.number_of_edges() + 1 != n or not nx.algorithms.is_tree(G):
+    if edges == []:
+        violations.append('empty tree, maybe the solver did not print the solution')
+        return violations
+    elif G.number_of_nodes() != n or G.number_of_edges() + 1 != n or not nx.algorithms.is_tree(G):
         violations.append('not a tree')
 
     exp_obj /= s
