@@ -131,22 +131,26 @@ def write_tsp(f, m):
     f.flush()
 
 
-def write_andinst(w, d):
+def write_andinst_to(w, d, f):
     n = len(w)
     m = 0
     for i in range(n):
         for j in range(i + 1, n):
             if w[i][j] != None:
                 m += 1
-    tmp = tempfile.NamedTemporaryFile(mode='w')
-    print(n, m, file=tmp.file)
+    print(n, m, file=f)
     for i in range(n):
         for j in range(i + 1, n):
             if w[i][j] != None:
-                print(i + 1, j + 1, w[i][j], file=tmp.file)
+                print(i + 1, j + 1, w[i][j], file=f)
     for i, d in enumerate(d):
-        print(i + 1, d, file=tmp)
-    tmp.flush()
+        print(i + 1, d, file=f)
+    f.flush()
+
+
+def write_andinst(w, d):
+    tmp = tempfile.NamedTemporaryFile(mode='w')
+    write_andinst_to(w, d, tmp)
     return tmp
 
 
@@ -160,9 +164,9 @@ def str_solution(sol):
 
 # Subprocess
 
-def run_solver(solver, instance, path):
+def run_solver(solver, instance, path, stderr = None):
     info('Running {} {} ({})', solver, instance, path)
-    result = subprocess.check_output(['solvers/' + solver, path])
+    result = subprocess.check_output(['solvers/' + solver, path], stderr=stderr)
     lines = result.decode().split('\n')
     return float(lines[0]), int(float(lines[1])), lines[2]
 
