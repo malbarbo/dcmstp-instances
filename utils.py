@@ -192,9 +192,17 @@ def matrix(n):
     return [[None] * n for _ in range(n)]
 
 
-def add_dummy_vertex(m):
+def add_dummy_vertex(m, deg1 = []):
     n = len(m)
-    mm = [[0] * (n + 1) for _ in range(n + 1)]
+    if deg1 == []:
+        mm = [[0] * (n + 1) for _ in range(n + 1)]
+    elif len(deg1) == 2:
+        mm = [[1000000] * (n + 1) for _ in range(n + 1)]
+        a, b = deg1
+        mm[n][a] = mm[n][b] = mm[a][n] = mm[b][n] = 0
+    else:
+        raise Exception('Exactly zero or two vertices must have dc = 1')
+
     for i in range(n):
         for j in range(n):
             mm[i][j] = m[i][j]

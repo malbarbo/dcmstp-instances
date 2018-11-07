@@ -14,9 +14,10 @@ CONCORDE = os.path.join(
 
 def main():
     m, d = utils.read_andinst(utils.read_values(sys.argv[1]))
-    if any(x != 2 for x in d):
-        raise Exception('All degree must be 2')
-    m = utils.add_dummy_vertex(m)
+    if any(x != 2 and x != 1 for x in d):
+        raise Exception('All degree constraint must be 2 or 1')
+    deg1 = list(v for (v, deg) in enumerate(d) if deg == 1)
+    m = utils.add_dummy_vertex(m, deg1)
     with tempfile.NamedTemporaryFile(mode='w') as tmp:
         utils.write_tsp(tmp, m)
         time, output = utils.subprocess_time_output(
