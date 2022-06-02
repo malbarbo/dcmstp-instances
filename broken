@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+echo FAILED TO DOWNLOAD $0
+exit 1

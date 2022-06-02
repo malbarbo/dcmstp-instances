@@ -5,28 +5,28 @@ all: instances solvers
 
 instances: download-var-instances download-shrd-instances download-ieee-instances
 
-# http://homepages.dcc.ufmg.br/~luishbicalho/dcmst/
+# Originally from http://homepages.dcc.ufmg.br/~luishbicalho/dcmst/
 download-var-instances: $(INSTANCES)/variable/ANDINST/tb1ct100_1.txt
 $(INSTANCES)/variable/ANDINST/tb1ct100_1.txt:
 	@echo Downloading variable instances
 	mkdir -p $(INSTANCES)/variable/ANDINST
-	curl -L http://homepages.dcc.ufmg.br/~luishbicalho/dcmst/allinstances.tar |\
+	curl -L https://malbarbo.pro.br/datasets/dcmstp-allinstances.tar.gz |\
 		tar xzf - --strip-components 1 -C $(INSTANCES)/variable/
 
-# https://turing.cs.hbg.psu.edu/txn131/spanning_tree.html
+# Originally from https://turing.cs.hbg.psu.edu/txn131/spanning_tree.html
 download-shrd-instances: $(INSTANCES)/fixed/shrd150
 $(INSTANCES)/fixed/shrd150:
 	@echo Downloading shrd instances
 	mkdir -p $(INSTANCES)/fixed/
-	curl -L https://turing.cs.hbg.psu.edu/txn131/file_instances/spanning_tree/SHRD-Graphs.tar.gz |\
+	curl -L https://malbarbo.pro.br/datasets/SHRD-Graphs.tar.gz |\
 		tar xzf - --strip-components 1 -C $(INSTANCES)/fixed/
 
-# https://turing.cs.hbg.psu.edu/txn131/spanning_tree.html
+# Originally from https://turing.cs.hbg.psu.edu/txn131/spanning_tree.html
 download-ieee-instances: $(INSTANCES)/fixed/m050n1
 $(INSTANCES)/fixed/m050n1:
 	@echo Downloading ieee instances
 	mkdir -p $(INSTANCES)/fixed/
-	curl -L https://turing.cs.hbg.psu.edu/txn131/file_instances/spanning_tree/IEEE-Graphs.tar.gz |\
+	curl -L https://malbarbo.pro.br/datasets/IEEE-Graphs.tar.gz |\
 		tar xzf - --strip-components 1 -C $(INSTANCES)/fixed/
 
 
@@ -62,18 +62,21 @@ $(SOLVERS)/dcmstp-choco/target/dcmstp-choco-4.1.1-shaded.jar:
 
 download-cgbc: $(SOLVERS)/cgbc
 $(SOLVERS)/cgbc:
-	curl -L http://homepages.dcc.ufmg.br/~luishbicalho/dcmst/CGBC.tar |\
-		tar xzf - -C $(SOLVERS)/ cgbc
+	ln -sr broken $(SOLVERS)/cgbc
+	#curl -L http://homepages.dcc.ufmg.br/~luishbicalho/dcmst/CGBC.tar |\
+	#	tar xzf - -C $(SOLVERS)/ cgbc
 
 download-bcp: $(SOLVERS)/bcp
 $(SOLVERS)/bcp:
-	curl -L http://homepages.dcc.ufmg.br/~luishbicalho/dcmst/BCP.tar |\
-		tar xzf - -C $(SOLVERS)/ bcp
+	ln -sr broken $(SOLVERS)/bcp
+	#curl -L http://homepages.dcc.ufmg.br/~luishbicalho/dcmst/BCP.tar |\
+	#	tar xzf - -C $(SOLVERS)/ bcp
 
 download-bcp-bc: $(SOLVERS)/bcp_bc
 $(SOLVERS)/bcp_bc:
-	curl -L http://homepages.dcc.ufmg.br/~luishbicalho/dcmst/BCP_BC.tar |\
-		tar xzf - -C $(SOLVERS)/ bcp_bc
+	ln -sr broken $(SOLVERS)/bcp_bc
+	#curl -L http://homepages.dcc.ufmg.br/~luishbicalho/dcmst/BCP_BC.tar |\
+	#	tar xzf - -C $(SOLVERS)/ bcp_bc
 
 # TODO: add ndrc-bc
 # TODO: add checksum for the download binaries

@@ -57,7 +57,7 @@ information.
 
 ## Solvers
 
-- [CG-BC, BCP and BCP-BC] from [3]
+- [CG-BC, BCP and BCP-BC] from [3] (Download links are broken)
 
 - [Choco] from [6]
 
@@ -112,15 +112,15 @@ Vertices 1 and 2 has degree constraint of 1 and vertices 3 and 4 degree constrai
 ## Instances
 
 - [CRD, SYM, STR and
-  SHRD](https://turing.cs.hbg.psu.edu/txn131/file_instances/spanning_tree/SHRD-Graphs.tar.gz)
+  SHRD](https://malbarbo.pro.br/datasets/SHRD-Graphs.tar.gz)
   instances from [9]
 
 - [Misleading and
-  R](https://turing.cs.hbg.psu.edu/txn131/file_instances/spanning_tree/IEEE-Graphs.tar.gz)
+  R](https://malbarbo.pro.br/datasets/IEEE-Graphs.tar.gz)
   instances from [8] and [10]
 
 - [ANDINST, DE, DR, LH-E and
-  LH-R](http://homepages.dcc.ufmg.br/~luishbicalho/dcmst/allinstances.tar)
+  LH-R](https://malbarbo.pro.br/datasets/dcmstp-allinstances.tar.gz)
   instances from [2], [5] and [3]
 
 
